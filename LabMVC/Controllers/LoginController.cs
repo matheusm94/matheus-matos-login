@@ -1,10 +1,8 @@
 ﻿using LabMVC.DTO;
 using LabMVC.ModelViews;
-using LabWebForms.Models;
+using LabMVC.Services;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
@@ -12,6 +10,7 @@ namespace LabMVC.Controllers
 {
     public class LoginController : Controller
     {
+        public UsuarioService usuarioService = new UsuarioService();
         public ActionResult Index()
         {
             return View();
@@ -19,10 +18,12 @@ namespace LabMVC.Controllers
 
         public ActionResult Logar(LoginDTO loginDTO)
         {
+            var usuario = usuarioService.BuscaLogin(loginDTO);
+            var loginPermitido = usuarioService.VerificaSenha(usuario, loginDTO.Senha);
             if (loginDTO == null || string.IsNullOrEmpty(loginDTO.Login) || string.IsNullOrEmpty(loginDTO.Senha)) 
                 return View("index", new ErroModelView { Mensagem = "Login ou senha inválida" });
 
-            if(loginDTO.Login == "cah" && loginDTO.Senha == "123456")
+            if(loginPermitido)
             {
                 var cookie = new HttpCookie("usuario_logado");
 
